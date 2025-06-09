@@ -4,6 +4,8 @@ from marketing_posts.crew import MarketingPostsCrew
 
 
 def run():
+    import litellm
+    litellm._turn_on_debug()
     # Replace with your inputs, it will automatically interpolate any tasks and agents information
     inputs = {
         'customer_domain': 'crewai.com',
