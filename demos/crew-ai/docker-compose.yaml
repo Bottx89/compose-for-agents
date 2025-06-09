@@ -1,8 +1,20 @@
 services:
   agents:
     build:
-        context: .       
+        context: .
     environment:
+      - OPENAI_MODEL_NAME=openai/ai/qwen3
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - SERPER_API_KEY=$SERPER_API_KEY
+      - LITELLM_LOG=debug
     restart: no
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - model
+
+  model:
+    provider:
+      type: model
+      options:
+        model: ai/qwen3

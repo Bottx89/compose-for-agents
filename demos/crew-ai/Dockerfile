@@ -8,4 +8,11 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-interaction --no-root
 COPY . .
 RUN poetry install
-CMD ["poetry", "run", "marketing_posts"]
+COPY <<EOF /entrypoint.sh
+#!/bin/sh
+set -e
+export OPENAI_BASE_URL=\${MODEL_URL}
+exec poetry run marketing_posts
+EOF
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]
