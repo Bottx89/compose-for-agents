@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  academic-research:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DOCKER_MODEL_RUNNER_MODEL_NAME=ai/gemma3-qat:27B-Q4_K_M
+    volumes:
+      # Mount .env file if it exists
+      - ./.env:/app/.env:ro
+    command: ["web"]
+    depends_on:
+      # compose docker-model-runner provider injects environment variables
+      - docker-model-runner
+
+  docker-model-runner:
+    provider:
+      type: model
+      options:
+        # pre-pull the model on Docker Model Runner
+        model: ai/gemma3-qat:27B-Q4_K_M	
+    environment:
+      - LLAMA_ARGS=--ctx-size 8000 --jinja -ngl 100

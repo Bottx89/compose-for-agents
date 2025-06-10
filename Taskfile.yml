@@ -1,6 +1,5 @@
 version: "3"
 
-dotenv: ['.env']
-
 includes:
   agno: demos/agno/Taskfile.yml
+  adk: demos/adk/Taskfile.yml

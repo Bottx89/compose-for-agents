@@ -1,0 +1,21 @@
+version: "3"
+
+vars:
+  IMAGE_NAME: academic-research
+  IMAGE_TAG: latest
+  CONTAINER_NAME: academic-research-agent
+  PORT: 8080
+
+tasks:
+  default:
+    cmds:
+      - task: up
+
+  # Docker Compose commands
+  up:
+    desc: Start services with docker-compose
+    cmd: docker-compose -f demos/adk/docker-compose.yml up --build
+
+  down:
+    desc: Stop and remove containers
+    cmd: docker-compose -f demos/adk/docker-compose.yml down
