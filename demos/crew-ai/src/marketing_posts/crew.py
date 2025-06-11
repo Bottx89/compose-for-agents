@@ -5,14 +5,14 @@ from crewai.project import CrewBase, agent, crew, task
 # Uncomment the following line to use an example of a custom tool
 # from marketing_posts.tools.custom_tool import MyCustomTool
 
-# Check our tools documentations for more information on how to use them
-from crewai_tools import SerperDevTool, ScrapeWebsiteTool
 from pydantic import BaseModel, Field
+
+from .tools import get_tools
 
 class MarketStrategy(BaseModel):
 	"""Market strategy model"""
 	name: str = Field(..., description="Name of the market strategy")
-	tatics: List[str] = Field(..., description="List of tactics to be used in the market strategy")
+	tactics: List[str] = Field(..., description="List of tactics to be used in the market strategy")
 	channels: List[str] = Field(..., description="List of channels to be used in the market strategy")
 	KPIs: List[str] = Field(..., description="List of KPIs to be used in the market strategy")
 
@@ -22,6 +22,10 @@ class CampaignIdea(BaseModel):
 	description: str = Field(..., description="Description of the campaign idea")
 	audience: str = Field(..., description="Audience of the campaign idea")
 	channel: str = Field(..., description="Channel of the campaign idea")
+
+class CampaignIdeas(BaseModel):
+	title: str = Field(..., description="A title for list of ideas")
+	ideas: List[CampaignIdea] = Field(..., description="List of campaign ideas")
 
 class Copy(BaseModel):
 	"""Copy model"""
@@ -38,7 +42,7 @@ class MarketingPostsCrew():
 	def lead_market_analyst(self) -> Agent:
 		return Agent(
 			config=self.agents_config['lead_market_analyst'],
-			tools=[SerperDevTool(), ScrapeWebsiteTool()],
+			tools=get_tools(),
 			verbose=True,
 			memory=False,
 		)
@@ -47,7 +51,7 @@ class MarketingPostsCrew():
 	def chief_marketing_strategist(self) -> Agent:
 		return Agent(
 			config=self.agents_config['chief_marketing_strategist'],
-			tools=[SerperDevTool(), ScrapeWebsiteTool()],
+			tools=get_tools(),
 			verbose=True,
 			memory=False,
 		)
@@ -87,7 +91,7 @@ class MarketingPostsCrew():
 		return Task(
 			config=self.tasks_config['campaign_idea_task'],
 			agent=self.creative_content_creator(),
-   		output_json=CampaignIdea
+   			output_json=CampaignIdeas
 		)
 
 	@task
@@ -95,7 +99,7 @@ class MarketingPostsCrew():
 		return Task(
 			config=self.tasks_config['copy_creation_task'],
 			agent=self.creative_content_creator(),
-   		context=[self.marketing_strategy_task(), self.campaign_idea_task()],
+   			context=[self.marketing_strategy_task(), self.campaign_idea_task()],
 			output_json=Copy
 		)
 

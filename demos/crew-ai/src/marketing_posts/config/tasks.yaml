@@ -25,7 +25,7 @@ marketing_strategy_task:
     task to create a high-quality strategy.
   expected_output: >
     A detailed marketing strategy document that outlines the goals, target
-    audience, key messages, and proposed tactics, make sure to have name, tatics, channels and KPIs
+    audience, key messages, and proposed tactics, make sure to have name, tactics, channels and KPIs
 
 campaign_idea_task:
   description: >

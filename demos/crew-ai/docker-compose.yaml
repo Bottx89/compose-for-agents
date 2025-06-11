@@ -6,12 +6,35 @@ services:
       - OPENAI_MODEL_NAME=openai/ai/qwen3
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - SERPER_API_KEY=$SERPER_API_KEY
-      - LITELLM_LOG=debug
+      - MCP_SERVER_URL=http://mcp-gateway:9011/sse
     restart: no
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
       - model
+      - mcp-gateway
+
+  mcp-gateway:
+    image: docker/agents_gateway:v2
+    ports:
+      - 9011:9011
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./docker-mcp.yaml:/app/docker-mcp.yaml"
+      - "./registry.yaml:/app/registry.yaml"
+      - "./config.yaml:/app/config.yaml"
+      - "./.env:/app/env"
+    command:
+      - --verbose
+      - --log-calls=true
+      - --transport=sse
+      - --catalog=/app/docker-mcp.yaml
+      - --config=/app/config.yaml
+      - --registry=/app/registry.yaml
+      - --secrets=/app/env
+      - --tools=search
+      - --tools=fetch_content
+      - --port=9011
 
   model:
     provider:
