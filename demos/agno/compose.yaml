@@ -4,22 +4,16 @@ services:
     ports:
       - "8811:8811"
     command:
-      - --port=8811
       - --block-secrets=true
       - --log-calls=true
       - --verify-signatures=true
       - --secrets=/run/secrets/mcp_secret
-      - --transport=stdio
       - --verbose
-      - --tools=*
       - --servers=github-official
       - --servers=notion
       - --servers=fetch
-      - --catalog=http://desktop.docker.com/mcp/catalog/v2/catalog.yaml
-      - --config=/.config.yaml
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.docker/mcp/config.yaml:/.config.yaml
     secrets:
       - mcp_secret
   
