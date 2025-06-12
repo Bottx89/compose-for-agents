@@ -22,13 +22,7 @@ COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
 # Copy application code
-COPY academic_research/ ./academic_research/
-COPY deployment/ ./deployment/
-COPY eval/ ./eval/
-COPY tests/ ./tests/
-
-# Copy environment example (users should mount their own .env)
-COPY .env.example ./
+COPY agents/ ./agents/
 
 # Create entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh

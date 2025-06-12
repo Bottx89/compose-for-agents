@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "academic_research"
+name = "adk-agents"
 version = "0.1.0"
 description = "AI-driven agent designed to facilitate the exploration of the academic landscape"
 authors = ["Antonio Gulli <gulli@google.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{include = "academic_research"}]
+packages = [{include = "agents"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"

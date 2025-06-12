@@ -43,7 +43,7 @@ case "${1:-web}" in
     cli)
         echo "Starting Academic Research Agent CLI..."
         cd /app
-        exec adk run academic_research
+        exec adk run agents
         ;;
     test)
         echo "Running tests..."

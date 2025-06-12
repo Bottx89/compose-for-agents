@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Academic_websearch_agent for finding research papers using search tools."""
+"""LLM Auditor for verifying & refining LLM-generated answers using the web."""
 
-from .agent import academic_websearch_agent
+from . import agent
+import os
+# Set the base URL for the OpenAI API to the Docker Model Runner URL
+os.environ.setdefault("OPENAI_BASE_URL", os.getenv("DOCKER-MODEL-RUNNER_URL"))
+# Set the API key to a dummy value since it's not used
+os.environ.setdefault("OPENAI_API_KEY","not-used")

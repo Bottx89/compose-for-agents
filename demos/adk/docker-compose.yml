@@ -1,21 +1,19 @@
-version: '3.8'
-
 services:
-  academic-research:
+  adk:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
-      - DOCKER_MODEL_RUNNER_MODEL_NAME=ai/gemma3-qat:27B-Q4_K_M
-    volumes:
-      # Mount .env file if it exists
-      - ./.env:/app/.env:ro
+      - MCPGATEWAY_ENDPOINT=http://mcp-gateway:8811/sse
     command: ["web"]
+    extra_hosts:
+      - host.docker.internal:host-gateway
     depends_on:
       # compose docker-model-runner provider injects environment variables
       - docker-model-runner
+      - mcp-gateway
 
   docker-model-runner:
     provider:
@@ -25,3 +23,16 @@ services:
         model: ai/gemma3-qat:27B-Q4_K_M	
     environment:
       - LLAMA_ARGS=--ctx-size 8000 --jinja -ngl 100
+
+  mcp-gateway:
+    image: docker/agents_gateway:v2
+    ports:
+      - "8811:8811"
+    command:
+      - --block-secrets=true
+      - --log-calls=true
+      - --verify-signatures=true
+      - --verbose
+      - --servers=duckduckgo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
