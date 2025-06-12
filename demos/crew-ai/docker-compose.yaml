@@ -3,18 +3,17 @@ services:
     build:
         context: .
     environment:
-      - OPENAI_MODEL_NAME=openai/ai/qwen3
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - SERPER_API_KEY=$SERPER_API_KEY
-      - MCP_SERVER_URL=http://mcp-gateway:9011/sse
+      - MCP_SERVER_URL=http://mcp_gateway:9011/sse
     restart: no
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
-      - model
-      - mcp-gateway
+      - model_runner
+      - mcp_gateway
 
-  mcp-gateway:
+  mcp_gateway:
     image: docker/agents_gateway:v2
     ports:
       - 9011:9011
@@ -36,7 +35,7 @@ services:
       - --tools=fetch_content
       - --port=9011
 
-  model:
+  model_runner:
     provider:
       type: model
       options:
