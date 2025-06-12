@@ -2,6 +2,7 @@ import os, socket
 from urllib.parse import urlparse
 from collections import defaultdict
 from typing import List, Sequence
+import json, textwrap
 
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
@@ -22,6 +23,7 @@ def create_mcp_toolsets(
     tools_cfg: Sequence[str],
 ) -> List[MCPToolset]:
     """Return *ready-to-use* MCPToolset objects – synchronously."""
+    print(f"create_mcp_toolsets: {tools_cfg}")
     if not tools_cfg:
         return []
 
@@ -46,8 +48,23 @@ def create_mcp_toolsets(
             args=["STDIO", f"TCP:{endpoint}"],
         )
 
-    return [
+    result = [
         MCPToolset(connection_params=conn_params,
                    tool_filter=tool_list)
         for tool_list in tools_by_server.values()
     ]
+    print(f"create_mcp_toolsets: {result}")
+    return result
+
+def flatten_ddg_output(tool_output, tool_name, **_):
+    if isinstance(tool_output, str):
+        return tool_output
+    if isinstance(tool_output, list):
+        lines = [
+            f"- **{item['title']}** — {item['url']}\n  {item.get('snippet','')}"
+            for item in tool_output[:5]          # up to 5 results
+        ]
+        return "\n".join(lines)
+
+    # Fallback: JSON pretty-print
+    return "```\n" + json.dumps(tool_output, ensure_ascii=False, indent=2) + "\n```"

@@ -24,7 +24,6 @@ import os
 
 llm_auditor = SequentialAgent(
     name='llm_auditor',
-    #model=LiteLlm(model=f"openai/{os.environ.get('DOCKER-MODEL-RUNNER_MODEL')}"),
     description=(
         'Evaluates LLM-generated answers, verifies actual accuracy using the'
         ' web, and refines the response to ensure alignment with real-world'

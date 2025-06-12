@@ -33,6 +33,7 @@ services:
       - --log-calls=true
       - --verify-signatures=true
       - --verbose
+      - --transport=sse
       - --servers=duckduckgo
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

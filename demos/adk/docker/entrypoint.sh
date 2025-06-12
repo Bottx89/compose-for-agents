@@ -38,7 +38,7 @@ case "${1:-web}" in
     web)
         echo "Starting Academic Research Agent web interface..."
         cd /app
-        exec adk web --host 0.0.0.0 --port 8080
+        exec adk web --host 0.0.0.0 --port 8080 --log_level DEBUG
         ;;
     cli)
         echo "Starting Academic Research Agent CLI..."

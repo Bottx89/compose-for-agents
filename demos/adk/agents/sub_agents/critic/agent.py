@@ -19,11 +19,13 @@ from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmResponse
 from google.adk.tools import google_search
 from google.adk.models.lite_llm import LiteLlm
-from google.genai import types
+from google.genai import types   # Part, Content, …
+from google.adk.models import LlmRequest, LlmResponse
+from typing import Optional
 
 from . import prompt
-import os, asyncio
-from .tools import create_mcp_toolsets
+import os, json
+from .tools import create_mcp_toolsets, flatten_ddg_output
 
 def _render_reference(
     callback_context: CallbackContext,
@@ -61,10 +63,52 @@ def _render_reference(
         del llm_response.content.parts[1:]
     return llm_response
 
+def force_string_content(
+    callback_context: CallbackContext, llm_request: LlmRequest
+) -> LlmResponse | None:
+    """
+    Ensure every Content in llm_request.contents ends up as a *single* text part,
+    so llama.cpp never sees lists/dicts/None.
+    """
+    new_contents: list[types.Content] = []
+
+    for content in llm_request.contents:
+        # 1️⃣  If it is already plain text, keep it
+        if isinstance(content, str):
+            new_contents.append(types.Content(role="user", parts=[types.Part(text=content)]))
+            continue
+
+        # 2️⃣  Merge multiple Parts into a single string
+        if isinstance(content, types.Content):
+            merged_text = "\n".join((p.text or "") for p in content.parts)
+            new_contents.append(
+                types.Content(role=content.role or "user",
+                              parts=[types.Part(text=merged_text)])
+            )
+            continue
+
+        # 3️⃣  Fallback: JSON-encode any dict / list / None
+        new_contents.append(
+            types.Content(role="user",
+                          parts=[types.Part(text=json.dumps(content, ensure_ascii=False))])
+        )
+
+    # add after new_contents construction
+    collapsed = []
+    for c in new_contents:
+        if collapsed and collapsed[-1].role == c.role:
+            collapsed[-1].parts[0].text += "\n" + c.parts[0].text
+        else:
+            collapsed.append(c)
+    llm_request.contents = collapsed
+    return None  # let ADK proceed normally
+
 critic_agent = Agent(
     model=LiteLlm(model=f"openai/{os.environ.get('DOCKER-MODEL-RUNNER_MODEL')}"),
     name='critic_agent',
     instruction=prompt.CRITIC_PROMPT,
     tools=create_mcp_toolsets(tools_cfg=["mcp/duckduckgo:search"]),
+    before_model_callback=force_string_content,
     after_model_callback=_render_reference,
+    after_tool_callback=flatten_ddg_output,
 )
