@@ -15,11 +15,9 @@
 """LLM Auditor for verifying & refining LLM-generated answers using the web."""
 
 from google.adk.agents import SequentialAgent
-from google.adk.models.lite_llm import LiteLlm
 
 from .sub_agents.critic import critic_agent
 from .sub_agents.reviser import reviser_agent
-import os
 
 
 llm_auditor = SequentialAgent(

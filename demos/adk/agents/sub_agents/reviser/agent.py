@@ -18,9 +18,8 @@ from google.adk import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmResponse
 from google.adk.models.lite_llm import LiteLlm
-from google.genai import types   # Part, Content, …
-from google.adk.models import LlmRequest, LlmResponse
-from typing import Optional
+from google.genai import types
+from google.adk.models import LlmRequest
 import os, json
 
 from . import prompt
@@ -44,6 +43,7 @@ def _remove_end_of_edit_mark(
 def force_string_content(
     callback_context: CallbackContext, llm_request: LlmRequest
 ) -> LlmResponse | None:
+    del callback_context  # unused
     """
     Ensure every Content in llm_request.contents ends up as a *single* text part,
     so llama.cpp never sees lists/dicts/None.

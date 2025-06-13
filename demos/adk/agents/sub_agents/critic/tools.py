@@ -2,7 +2,6 @@ import os, socket
 from urllib.parse import urlparse
 from collections import defaultdict
 from typing import List, Sequence
-import json, textwrap
 
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
@@ -14,16 +13,14 @@ def _tcp_check(host: str, port: int) -> None:
     """Fail fast if the MCP gateway is unreachable."""
     try:
         with socket.create_connection((host, port), timeout=5):
-            print(f"TCP check OK → {host}:{port}")
+            pass
     except OSError as e:
         raise RuntimeError(f"cannot reach {host}:{port}: {e}") from e
-
 
 def create_mcp_toolsets(
     tools_cfg: Sequence[str],
 ) -> List[MCPToolset]:
-    """Return *ready-to-use* MCPToolset objects – synchronously."""
-    print(f"create_mcp_toolsets: {tools_cfg}")
+    """Return MCPToolset objects – let ADK handle async initialization naturally."""
     if not tools_cfg:
         return []
 
@@ -32,7 +29,8 @@ def create_mcp_toolsets(
         if not raw.startswith("mcp/") or ":" not in raw:
             raise ValueError(f"Bad MCP spec: {raw}")
         server, tool = raw[4:].split(":", 1)
-        tools_by_server[server].append(f"{server}:{tool}")
+        # Use just the tool name, not server:tool format
+        tools_by_server[server].append(tool)
 
     endpoint = os.environ["MCPGATEWAY_ENDPOINT"]
     if endpoint.startswith(("http://", "https://")):
@@ -48,23 +46,9 @@ def create_mcp_toolsets(
             args=["STDIO", f"TCP:{endpoint}"],
         )
 
-    result = [
-        MCPToolset(connection_params=conn_params,
-                   tool_filter=tool_list)
-        for tool_list in tools_by_server.values()
-    ]
-    print(f"create_mcp_toolsets: {result}")
+    result = []
+    for tool_list in tools_by_server.values():
+        toolset = MCPToolset(connection_params=conn_params, tool_filter=tool_list)
+        result.append(toolset)
+
     return result
-
-def flatten_ddg_output(tool_output, tool_name, **_):
-    if isinstance(tool_output, str):
-        return tool_output
-    if isinstance(tool_output, list):
-        lines = [
-            f"- **{item['title']}** — {item['url']}\n  {item.get('snippet','')}"
-            for item in tool_output[:5]          # up to 5 results
-        ]
-        return "\n".join(lines)
-
-    # Fallback: JSON pretty-print
-    return "```\n" + json.dumps(tool_output, ensure_ascii=False, indent=2) + "\n```"

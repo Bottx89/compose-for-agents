@@ -22,12 +22,15 @@ os.environ.setdefault("OPENAI_BASE_URL", os.getenv("DOCKER-MODEL-RUNNER_URL"))
 # Set the API key to a dummy value since it's not used
 os.environ.setdefault("OPENAI_API_KEY","not-used")
 
-# Enable debug logging 
+# Enable logging with reduced verbosity
 logging.basicConfig(
-    level=logging.DEBUG,                         # ADK, FastAPI, everything
+    level=logging.INFO,                          # Less verbose than DEBUG
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     force=True,                                  # override ADK defaults
 )
-logging.getLogger("google.adk").setLevel(logging.DEBUG)
-logging.getLogger("LiteLLM").setLevel(logging.DEBUG)
-litellm.set_verbose = True                       # raw HTTP <--> model
+logging.getLogger("google.adk").setLevel(logging.INFO)
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)  # Much less verbose
+logging.getLogger("litellm").setLevel(logging.WARNING)  # Also reduce this
+logging.getLogger("httpx").setLevel(logging.WARNING)    # Reduce HTTP logs
+logging.getLogger("httpcore").setLevel(logging.WARNING) # Reduce HTTP core logs
+litellm.set_verbose = False                      # Disable raw HTTP logs
