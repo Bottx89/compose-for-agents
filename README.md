@@ -3,84 +3,21 @@
 ## Prerequisites
 
 + Install Docker Desktop `4.41` or a recent `4.42 nightly`
-+ If using 4.41, install the MCP Toolkit extension (version `1.0.0`)
-+ If using a 4.42 nightly, use the MCP Toolkit in the left nav
 
-## OpenAI API Key
+## Demos
 
-1. Generate a key by navigating to https://platform.openai.com/api-keys
-1. Create a `.env` file and add your OpenAI API key to it:
-```console
-OPENAI_API_KEY=<KEY>
-```
+Each of these demos is self-contained and can be run either locally or using a cloud context. They are all configured using two steps.
 
-## Configure MCP Servers
+1. change directory to the root of the demo project
+1. create a `.mcp.env` file from the `mcp.env.example` file and supply the required MCP tokens
+2. run `docker compose up --build`
 
-+ Configure the following MCP Servers in the Docker Desktop extension (Desktop 4.41) or MCP Toolkit left nav (Desktop 4.42 nightly):
-  + Notion
-  + GitHub Official
+| Demo | Models | MCPs | project | compose |
+| ---- | ---- | ---- | ---- | ---- |
+| [Agno](https://github.com/agno-agi/agno) agent that summarizes GitHub issues | deepseek(local), qwen3(local), o3(openai) | github-official, notion, fetch | [project](./demos/agno) | [compose.yaml](./demos/agno/compose.yaml) |
+| [Vercel AI-SDK](https://github.com/vercel/ai) Chat-UI for mixing MCPs and Model | llama3.2(local), qwen3(local) | wikipedia-mcp, brave, resend(email) | [project](https://github.com/slimslenderslacks/scira-mcp-chat) | [compose.yaml](https://github.com/slimslenderslacks/scira-mcp-chat/blob/main/compose.yaml) |
+| [CrewAI](https://github.com/crewAIInc/crewAI) Marketing Strategy Agent | qwen3(local) | duckduckgo | unmerged | [compose.yaml](https://github.com/docker/compose-agents-demo/blob/alberto/crew-ai/demos/crew-ai/docker-compose.yaml) |
+| [ADK](https://github.com/google/adk-python) academic_research agent | TODO | TODO | TODO | TODO | 
+| [LangGraph](https://github.com/langchain-ai/langgraph) SQL Agent | TODO | TODO | TODO | TODO | 
+| [Embabel](https://github.com/embabel/embabel-agent) Travel Agent | TODO | TODO | TODO | TODO | 
 
-### Notion
-
-1. Create a new Notion account using a non-company email address
-1. Create a new integration by navigating to https://www.notion.so/my-integrations
-1. Follow the creation flow enabling write access
-1. Add the Notion MCP Server in Docker Desktop
-![Notion MCP extension](./img/notion-mcp-server.png)
-1. Copy the integration token into Desktop's MCP server configuration
-![Notion token](./img/notion-token.png)
-![Notion MCP config](./img/notion-mcp-config.png)
-1. Create a page named "Updates" in your workspace
-1. Give your integration access to the page by clicking on the ... menu on the top right of the updates page, clicking "Connections" and selecting it
-![Notion page perms](./img/notion-page-perms.png)
-
-### GitHub Official
-
-1. Create a fine grained personal access token: https://github.com/settings/personal-access-tokens
-1. Give it read access to public repos
-![GitHub token perms](./img/github-perms.png)
-1. Add the "GitHub Official" MCP server
-![GitHub MCP server](./img/github-mcp-server.png)
-1. Add your token to it
-
-## Build Docker CLI Plugin
-
-Either with `task install` or manually:
-
-On Mac:
-
-```console
-docker buildx bake --file docker-bake.hcl darwin
-ln -sf $(pwd)/bin/docker-compose ~/.docker/cli-plugins/
-```
-
-On Windows:
-
-```console
-docker buildx bake --file docker-bake.hcl windows
-Copy-Item -Path ./bin/docker-compose.exe -Destination "$env:USERPROFILE\.docker\cli-plugins"
-```
-
-## And Run!
-
-Start the application:
-
-```console
-docker compose up --build
-docker compose down --remove-orphans
-```
-
-**You can then see the agent UI on http://localhost:3000**
-
-As an alternative, you can also use `task`
-
-```console
-task up
-task down
-```
-
-Cleanup:
-
-```console
-task down
-```
