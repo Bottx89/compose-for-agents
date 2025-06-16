@@ -1,0 +1,1 @@
+postgres.url=postgres://user:password@host.docker.internal:5432/database

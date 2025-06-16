@@ -1,0 +1,62 @@
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d database"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  importer:
+    build:
+      target: importer
+    environment:
+      SQLITE_FILE: /app/Chinook.db
+      DATABASE_URL: postgres://user:password@database:5432/database
+    volumes:
+      - ./Chinook.db:/app/Chinook.db
+    restart: on-failure
+    depends_on:
+      database:
+        condition: service_healthy
+
+  agent:
+    build:
+      target: agent
+    environment:
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - MCP_SERVER_URL=http://mcp_gateway:8811/sse
+      - DATABASE_DIALECT=PostgreSQL
+    depends_on:
+      - database
+      - model_runner # Comment this out and provide an API key to use OpenAI
+
+  mcp_gateway:
+    image: docker/agents_gateway:v2
+    ports:
+      - 9911:8811
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command:
+      - --transport=sse
+      - --secrets=/run/secrets/database_url
+      - --servers=postgres
+      - --tools=query
+    secrets:
+      - database_url
+
+  model_runner:
+    provider:
+      type: model
+      options:
+        model: olegselajev241/qwen3:14B-Q6_K
+
+secrets:
+  database_url:
+    file: ./postgres_url
