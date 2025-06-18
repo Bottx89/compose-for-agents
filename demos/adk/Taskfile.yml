@@ -14,8 +14,8 @@ tasks:
   # Docker Compose commands
   up:
     desc: Start services with docker-compose
-    cmd: docker-compose -f demos/adk/docker-compose.yml up --build
+    cmd: docker-compose -f compose.yaml up --build
 
   down:
     desc: Stop and remove containers
-    cmd: docker-compose -f demos/adk/docker-compose.yml down
+    cmd: docker-compose -f compose.yaml down --remove-orphans
