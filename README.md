@@ -19,5 +19,6 @@ Each of these demos is self-contained and can be run either locally or using a c
 | [CrewAI](https://github.com/crewAIInc/crewAI) Marketing Strategy Agent | qwen3(local) | duckduckgo | [./demos/crew-ai](./demos/crew-ai) | [compose.yaml](https://github.com/docker/compose-agents-demo/blob/main/demos/crew-ai/compose.yaml) |
 | [ADK](https://github.com/google/adk-python) academic_research agent | gemma3-qat(local) | duckduckgo | [./demos/adk](./demos/adk) | [compose.yaml](./demos/adk/compose.yaml) | 
 | [LangGraph](https://github.com/langchain-ai/langgraph) SQL Agent | qwen3(local) | postgres | [./demos/langgraph](./demos/langgraph) | [compose.yaml](./demos/langgraph/compose.yaml) |
-| [Embabel](https://github.com/embabel/embabel-agent) Travel Agent | TODO | TODO | TODO | TODO | 
+| [Embabel](https://github.com/embabel/embabel-agent) Travel Agent | qwen3, Claude3.7, llama3.2 | brave, github-official, wikipedia-mcp, weather, google-maps | [Repository](https://github.com/embabel/travel-planner-agent) | [compose.yaml](https://github.com/slimslenderslacks/travel-planner-agent/blob/slim/compose/compose.yaml) and [compose.dmr.yaml](https://github.com/slimslenderslacks/travel-planner-agent/blob/slim/compose/compose.dmr.yaml) |
 
+* the embabel demo merges two compose files at runtime. This is because it also supports an Ollama configuration so there is a compose.ollama.yaml file and a compose.dmr.yaml file.
