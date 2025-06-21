@@ -14,6 +14,7 @@ services:
       - --servers=fetch
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /run/host-services/backend.sock:/run/host-services/backend.sock
     secrets:
       - mcp_secret
   
