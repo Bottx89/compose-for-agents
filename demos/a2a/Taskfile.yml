@@ -1,0 +1,48 @@
+version: "3"
+
+vars:
+  IMAGE_NAME: academic-research
+  IMAGE_TAG: latest
+  CONTAINER_NAME: academic-research-agent
+  PORT: 8080
+
+tasks:
+  default:
+    cmds:
+      - task: up
+
+  # Docker Compose commands
+  up:
+    desc: Start services with docker-compose
+    cmd: docker compose -f demos/a2a/compose.yml up --build --wait
+
+  down:
+    desc: Stop and remove containers
+    cmd: docker compose -f demos/a2a/compose.yml down
+
+  test:
+    desc: Test the Critic agent
+    cmds:
+      - docker compose -f demos/a2a/compose.yml --verbose up -d --wait --build
+      - >
+        curl -X POST http://localhost:8001
+        -H "Content-Type: application/json"
+        -d '{
+          "jsonrpc": "2.0",
+          "id": "req-1",
+          "method": "message/send",
+          "params": {
+            "id": "task-1",
+            "message": {
+              "messageId": "msg-1",
+              "kind": "message",
+              "role": "user",
+              "parts": [
+                { "kind": "text", "text": "Earth is flat" }
+              ]
+            },
+            "skill": "fact_check_answer"
+          }
+        }' | jq
+      - docker compose -f demos/a2a/compose.yml logs mcp-gateway
+      - docker compose -f demos/a2a/compose.yml down
